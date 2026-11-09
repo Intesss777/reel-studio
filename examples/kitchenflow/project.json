@@ -1,0 +1,552 @@
+{
+  "name": "kitchenflow",
+  "format": {
+    "width": 1080,
+    "height": 1920
+  },
+  "fps": 30,
+  "loudness": -14,
+  "scenes": "scenes.js",
+  "voice": {
+    "provider": "edge",
+    "voice": "ru-RU-DmitryNeural",
+    "rate": "+0%",
+    "pitch": "-2Hz"
+  },
+  "music": {
+    "bpm": 120,
+    "drop": "s1",
+    "outro": "outro",
+    "hats": [
+      "s2",
+      "s8"
+    ],
+    "arp": [
+      "s3",
+      "s8"
+    ],
+    "progression": [
+      [
+        38,
+        50,
+        57,
+        60,
+        64,
+        65
+      ],
+      [
+        34,
+        46,
+        53,
+        57,
+        60,
+        62
+      ],
+      [
+        31,
+        43,
+        50,
+        53,
+        57,
+        58
+      ],
+      [
+        33,
+        45,
+        52,
+        57,
+        62,
+        64
+      ]
+    ]
+  },
+  "timeline": {
+    "order": [
+      "intro",
+      "s1",
+      "r1",
+      "s2",
+      "s3",
+      "r2",
+      "s4",
+      "r3",
+      "s5",
+      "r4",
+      "s6",
+      "r5",
+      "s7",
+      "s8",
+      "outro"
+    ],
+    "beat": 0.5,
+    "gap": 0.38,
+    "lead": {
+      "intro": 0.25,
+      "s5": 0.35,
+      "r1": 0.5,
+      "r2": 0.45,
+      "r3": 0.45,
+      "r4": 0.45,
+      "r5": 0.45
+    },
+    "defaultLead": 0.3,
+    "post": {
+      "intro": 0.5,
+      "s2": 1.9,
+      "s4": 0.6,
+      "s8": 1.0,
+      "r1": 1.1,
+      "r2": 1.6,
+      "r3": 1.0,
+      "r4": 2.0,
+      "r5": 1.2
+    },
+    "defaultPost": 0.8,
+    "minLen": {
+      "intro": 4.0,
+      "s1": 5.0,
+      "s2": 6.0,
+      "s3": 6.5,
+      "s4": 5.5,
+      "s5": 5.5,
+      "s6": 6.0,
+      "s7": 6.5,
+      "s8": 6.0,
+      "r1": 6.0,
+      "r2": 6.0,
+      "r3": 6.0,
+      "r4": 6.0,
+      "r5": 6.0
+    },
+    "fixed": {
+      "outro": {
+        "len": 7.0,
+        "voiceAt": 2.35
+      }
+    }
+  },
+  "ui": {
+    "capture": {
+      "src": "invoice-capture-card",
+      "w": 952,
+      "h": 144
+    },
+    "confirmed": {
+      "src": "invoice-confirmed",
+      "w": 608,
+      "h": 586
+    },
+    "confirmedStatus": {
+      "src": "invoice-confirmed-status",
+      "w": 560,
+      "h": 87
+    },
+    "invRows": {
+      "src": "inventory-rows",
+      "w": 928,
+      "h": 412
+    },
+    "shortage": {
+      "src": "purchases-shortage",
+      "w": 552,
+      "h": 252
+    },
+    "listTop": {
+      "src": "purchases-list-top",
+      "w": 380,
+      "h": 490
+    },
+    "msgDialog": {
+      "src": "purchase-message-dialog",
+      "w": 449,
+      "h": 419
+    },
+    "msgText": {
+      "src": "purchase-message-text",
+      "w": 401,
+      "h": 225
+    },
+    "chart": {
+      "src": "overview-revenue-chart",
+      "w": 952,
+      "h": 434
+    },
+    "cardRevenue": {
+      "src": "overview-card-revenue",
+      "w": 231,
+      "h": 82
+    },
+    "cardMargin": {
+      "src": "overview-card-margin",
+      "w": 231,
+      "h": 82
+    },
+    "pillAll": {
+      "src": "inventory-pill-all",
+      "w": 123,
+      "h": 41
+    },
+    "pillLow": {
+      "src": "inventory-pill-low",
+      "w": 73,
+      "h": 39
+    },
+    "pillOk": {
+      "src": "inventory-pill-ok",
+      "w": 98,
+      "h": 39
+    }
+  },
+  "recordings": {
+    "r1": {
+      "bg": "bg/bg-01.jpg",
+      "title": "Главный экран"
+    },
+    "r2": {
+      "bg": "bg/bg-03.jpg",
+      "title": "Накладные"
+    },
+    "r3": {
+      "bg": "bg/bg-04.jpg",
+      "title": "Склад"
+    },
+    "r4": {
+      "bg": "bg/bg-05.jpg",
+      "title": "Закупка"
+    },
+    "r5": {
+      "bg": "bg/bg-06.jpg",
+      "title": "Поставщики"
+    }
+  },
+  "footage": [
+    {
+      "id": "r1",
+      "src": "assets/rec/r1.mp4",
+      "track": "assets/rec/r1.track.json"
+    },
+    {
+      "id": "r2",
+      "src": "assets/rec/r2.mp4",
+      "track": "assets/rec/r2.track.json"
+    },
+    {
+      "id": "r3",
+      "src": "assets/rec/r3.mp4",
+      "track": "assets/rec/r3.track.json"
+    },
+    {
+      "id": "r4",
+      "src": "assets/rec/r4.mp4",
+      "track": "assets/rec/r4.track.json"
+    },
+    {
+      "id": "r5",
+      "src": "assets/rec/r5.mp4",
+      "track": "assets/rec/r5.track.json"
+    }
+  ],
+  "backgrounds": {
+    "plate": "assets/bg/plate.jpg",
+    "out": "assets/bg",
+    "width": 1080,
+    "height": 1920,
+    "accentRgb": [
+      255,
+      98,
+      44
+    ],
+    "glowRgb": [
+      230,
+      70,
+      20
+    ],
+    "edgeRgb": [
+      206,
+      203,
+      196
+    ],
+    "shape": [
+      [
+        573.9,
+        0.0
+      ],
+      [
+        633.5,
+        114.8
+      ],
+      [
+        686.3,
+        229.5
+      ],
+      [
+        743.7,
+        323.7
+      ],
+      [
+        843.6,
+        427.0
+      ],
+      [
+        948.0,
+        564.7
+      ],
+      [
+        1028.4,
+        688.6
+      ],
+      [
+        1080.0,
+        751.8
+      ],
+      [
+        1101.8,
+        751.8
+      ],
+      [
+        1101.8,
+        -23.0
+      ],
+      [
+        573.9,
+        -23.0
+      ]
+    ],
+    "defaults": {
+      "spacing": 24,
+      "warp": 78,
+      "scale": 270,
+      "spread": 0.45
+    },
+    "scenes": {
+      "bg-01": {
+        "seed": 11,
+        "guide": [
+          [
+            880,
+            430
+          ],
+          [
+            935,
+            760
+          ],
+          [
+            1010,
+            1100
+          ],
+          [
+            860,
+            1420
+          ],
+          [
+            480,
+            1660
+          ],
+          [
+            60,
+            1760
+          ],
+          [
+            -140,
+            1800
+          ]
+        ],
+        "n": 8,
+        "accentLines": [
+          1,
+          3,
+          -2
+        ]
+      },
+      "bg-02": {
+        "seed": 23,
+        "guide": [
+          [
+            900,
+            470
+          ],
+          [
+            965,
+            850
+          ],
+          [
+            930,
+            1250
+          ],
+          [
+            995,
+            1600
+          ],
+          [
+            1070,
+            2000
+          ]
+        ],
+        "n": 6,
+        "accentLines": [
+          0,
+          -3
+        ]
+      },
+      "bg-03": {
+        "seed": 37,
+        "guide": [
+          [
+            1150,
+            1180
+          ],
+          [
+            900,
+            1500
+          ],
+          [
+            620,
+            1640
+          ],
+          [
+            300,
+            1700
+          ],
+          [
+            -120,
+            1880
+          ]
+        ],
+        "n": 7,
+        "accentLines": [
+          2,
+          -1
+        ]
+      },
+      "bg-05": {
+        "seed": 53,
+        "guide": [
+          [
+            1160,
+            1540
+          ],
+          [
+            830,
+            1690
+          ],
+          [
+            520,
+            1760
+          ],
+          [
+            200,
+            1870
+          ],
+          [
+            -80,
+            2000
+          ]
+        ],
+        "n": 7,
+        "accentLines": [
+          1,
+          -2
+        ]
+      },
+      "bg-06": {
+        "seed": 61,
+        "guide": [
+          [
+            870,
+            430
+          ],
+          [
+            1045,
+            820
+          ],
+          [
+            860,
+            1240
+          ],
+          [
+            520,
+            1520
+          ],
+          [
+            140,
+            1640
+          ],
+          [
+            -140,
+            1700
+          ]
+        ],
+        "n": 9,
+        "accentLines": [
+          0,
+          2,
+          -3
+        ]
+      },
+      "bg-07": {
+        "seed": 71,
+        "guide": [
+          [
+            -60,
+            300
+          ],
+          [
+            120,
+            760
+          ],
+          [
+            70,
+            1200
+          ],
+          [
+            160,
+            1620
+          ],
+          [
+            60,
+            2010
+          ]
+        ],
+        "n": 5,
+        "accentLines": [
+          1
+        ]
+      },
+      "bg-08": {
+        "seed": 83,
+        "guide": [
+          [
+            880,
+            440
+          ],
+          [
+            1005,
+            900
+          ],
+          [
+            905,
+            1280
+          ],
+          [
+            620,
+            1560
+          ],
+          [
+            300,
+            1760
+          ],
+          [
+            -100,
+            1900
+          ]
+        ],
+        "n": 8,
+        "accentLines": [
+          1,
+          -2,
+          3
+        ]
+      }
+    }
+  }
+}

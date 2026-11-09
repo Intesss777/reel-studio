@@ -1,0 +1,37 @@
+{
+  "name": "KitchenFlow",
+  "colors": {
+    "ink": "#10100F",
+    "paper": "#F4EEE1",
+    "accent": "#FF521C",
+    "accent2": "#EE4614",
+    "muted": "#8C8982",
+    "mark": "#C96442"
+  },
+  "fontFamily": "Onest",
+  "fonts": [
+    {
+      "family": "Onest",
+      "file": "fonts/Onest-wght.ttf",
+      "weight": "100 900",
+      "preload": [
+        500,
+        600,
+        700
+      ]
+    }
+  ],
+  "logo": "logo.svg",
+  "language": "ru",
+  "address": "вы",
+  "cta": {
+    "keyword": "КУХНЯ",
+    "offer": "демо KitchenFlow на процессе ресторана"
+  },
+  "world": "Graphite paper, one dark volumetric form with an orange rim top right, embossed contour lines with rare orange threads. One plate for the whole reel; lines differ per scene.",
+  "rules": [
+    "Only real KitchenFlow screens; never generated or redrawn UI, never invented numbers.",
+    "Demo data and demo OCR are labelled as demo on screen and in the voice.",
+    "The voice reads what is on screen; every on-screen word appears when it is spoken."
+  ]
+}

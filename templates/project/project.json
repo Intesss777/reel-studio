@@ -1,0 +1,21 @@
+{
+  "name": "my-reel",
+  "format": { "width": 1080, "height": 1920 },
+  "fps": 30,
+  "loudness": -14,
+  "scenes": "scenes.js",
+  "voice": { "provider": "edge", "voice": "ru-RU-DmitryNeural", "rate": "+0%", "pitch": "-2Hz" },
+  "music": { "bpm": 120, "drop": "point", "outro": "outro", "hats": ["point", "outro"], "arp": ["cta", "outro"] },
+  "timeline": {
+    "order": ["hook", "point", "cta", "outro"],
+    "beat": 0.5,
+    "gap": 0.38,
+    "defaultLead": 0.3,
+    "defaultPost": 0.8,
+    "minLen": { "hook": 4, "point": 5, "cta": 5 },
+    "fixed": { "outro": { "len": 4, "voiceAt": 1.2 } }
+  },
+  "ui": {},
+  "recordings": {},
+  "footage": []
+}

@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+# Generated per project: voice-over, timeline, recordings frames, renders.
+projects/*/build/
+examples/*/build/
+*.tmp.mp4

@@ -1,0 +1,20 @@
+{
+  "name": "reel-studio",
+  "version": "0.1.0",
+  "description": "Claude Code plugin and engine for producing branded vertical reels and carousels: real product UI, screen recordings, IRL footage, voice-driven timing and motion design.",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "bin": { "reel": "engine/cli.mjs" },
+  "scripts": {
+    "reel": "node engine/cli.mjs",
+    "browsers": "playwright install chromium-headless-shell"
+  },
+  "dependencies": {
+    "playwright": "1.64.1"
+  },
+  "optionalDependencies": {
+    "ffmpeg-static": "5.3.0"
+  },
+  "engines": { "node": ">=20" }
+}

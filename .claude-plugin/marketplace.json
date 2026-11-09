@@ -1,0 +1,11 @@
+{
+  "name": "reel-studio",
+  "owner": { "name": "Makhach Musaev" },
+  "plugins": [
+    {
+      "name": "reel-studio",
+      "source": "./",
+      "description": "Branded vertical reels and carousels with real product UI, app screen recordings, IRL footage, voice-driven timing, motion design and sound."
+    }
+  ]
+}

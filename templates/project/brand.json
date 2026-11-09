@@ -1,0 +1,12 @@
+{
+  "name": "Brand",
+  "colors": { "ink": "#121212", "paper": "#F1EFEA", "accent": "#D9472B", "accent2": "#C23B22", "muted": "#8C8A85", "mark": "#D9472B" },
+  "fontFamily": "Onest",
+  "fonts": [{ "family": "Onest", "file": "fonts/Onest-wght.ttf", "weight": "100 900", "preload": [500, 600, 700] }],
+  "logo": null,
+  "language": "ru",
+  "address": "вы",
+  "cta": { "keyword": "ДЕМО", "offer": "[FACT NEEDED: what the viewer gets after writing the keyword]" },
+  "world": "[Describe the background world from the client's business: material, light, one dominant form.]",
+  "rules": ["Only real product screens and real numbers.", "Demo data is labelled as demo."]
+}

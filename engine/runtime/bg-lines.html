@@ -1,0 +1,149 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>reel-studio background lines</title></head>
+<body style="margin:0;background:#000">
+<script>
+// Draws embossed contour-line bundles over a plate image: groove shadow, broken light edge, rare accent threads.
+// window.renderBg(config) -> PNG data URL. Config: plate, width, height, seed, guide [[x,y]...], n, spacing, warp, scale,
+// spread, accent lines (level indices), accent / glow / edge colors as [r,g,b], optional shape polygon kept clean.
+let W = 1080, H = 1920; const SS = 2, GRID = 3;
+function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; }; }
+function makeNoise(seed) {
+  const r = rng(seed), P = 256, v = new Float32Array(P * P);
+  for (let i = 0; i < v.length; i++) v[i] = r();
+  const s = (t) => t * t * (3 - 2 * t);
+  const at = (x, y) => v[((y & 255) * P) + (x & 255)];
+  const n = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = s(x - xi), yf = s(y - yi);
+    const a = at(xi, yi), b = at(xi + 1, yi), c = at(xi, yi + 1), d = at(xi + 1, yi + 1);
+    return (a + (b - a) * xf) + ((c + (d - c) * xf) - (a + (b - a) * xf)) * yf; };
+  return (x, y, oct = 3) => { let sum = 0, amp = 1, f = 1, norm = 0; for (let o = 0; o < oct; o++) { sum += n(x * f + o * 17.3, y * f - o * 9.1) * amp; norm += amp; amp *= 0.5; f *= 2.03; } return sum / norm * 2 - 1; };
+}
+function catmull(pts, steps = 40) {
+  const out = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    for (let j = 0; j < steps; j++) {
+      const t = j / steps, t2 = t * t, t3 = t2 * t;
+      out.push([0, 1].map((k) => 0.5 * ((2 * p1[k]) + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t2 + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t3)));
+    }
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
+}
+function loadImage(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+
+window.renderBg = async function renderBg(cfg) {
+  W = cfg.width || 1080; H = cfg.height || 1920;
+  const [ar, ag, ab] = cfg.accentRgb || [255, 98, 44], [gr_, gg, gb] = cfg.glowRgb || [230, 70, 20], [er, eg, eb] = cfg.edgeRgb || [206, 203, 196];
+  cfg.shape = cfg.shape || [];
+  cfg.orange = cfg.accentLines || cfg.orange || [];
+  const plate = await loadImage(cfg.plate);
+  const noise = makeNoise(cfg.seed), noise2 = makeNoise(cfg.seed + 101), breakN = makeNoise(cfg.seed + 202);
+  const guide = catmull(cfg.guide);
+  // Cumulative length along the guide for spacing modulation.
+  const cum = [0]; for (let i = 1; i < guide.length; i++) cum.push(cum[i - 1] + Math.hypot(guide[i][0] - guide[i - 1][0], guide[i][1] - guide[i - 1][1]));
+  const gw = Math.ceil(W / GRID) + 1, gh = Math.ceil(H / GRID) + 1, field = new Float32Array(gw * gh);
+  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
+    const x = gx * GRID, y = gy * GRID;
+    let best = 1e9, sign = 1, along = 0;
+    for (let i = 0; i < guide.length - 1; i++) {
+      const [ax, ay] = guide[i], [bx, by] = guide[i + 1];
+      const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / l2));
+      const px = ax + dx * t, py = ay + dy * t, d = Math.hypot(x - px, y - py);
+      if (d < best) { best = d; sign = (dx * (y - ay) - dy * (x - ax)) > 0 ? 1 : -1; along = cum[i] + t * Math.sqrt(l2); }
+    }
+    const warp = cfg.warp * noise(x / cfg.scale, y / cfg.scale) + cfg.warp * 0.45 * noise2(x / (cfg.scale * 0.5), y / (cfg.scale * 0.5));
+    const spread = 1 + cfg.spread * noise2(along / 520, 3.3);
+    field[gy * gw + gx] = (sign * best + warp) / spread;
+  }
+  // Marching squares per level.
+  const levels = [];
+  { const lr = rng(cfg.seed + 7); let up = cfg.offset, dn = cfg.offset; levels.push({ k: 0, v: cfg.offset });
+    for (let k = 1; k <= cfg.n; k++) { up += cfg.spacing * (0.6 + lr() * 0.9); dn -= cfg.spacing * (0.6 + lr() * 0.9); levels.push({ k, v: up }, { k: -k, v: dn }); } }
+  const segsFor = (lv) => {
+    const segs = [];
+    for (let gy = 0; gy < gh - 1; gy++) for (let gx = 0; gx < gw - 1; gx++) {
+      const a = field[gy * gw + gx] - lv, b = field[gy * gw + gx + 1] - lv, c = field[(gy + 1) * gw + gx + 1] - lv, d = field[(gy + 1) * gw + gx] - lv;
+      const idx = (a > 0 ? 8 : 0) | (b > 0 ? 4 : 0) | (c > 0 ? 2 : 0) | (d > 0 ? 1 : 0);
+      if (idx === 0 || idx === 15) continue;
+      const x0 = gx * GRID, y0 = gy * GRID;
+      const top = [x0 + GRID * a / (a - b), y0], right = [x0 + GRID, y0 + GRID * b / (b - c)], bottom = [x0 + GRID * d / (d - c), y0 + GRID], left = [x0, y0 + GRID * a / (a - d)];
+      const map = { 1: [[left, bottom]], 2: [[bottom, right]], 3: [[left, right]], 4: [[top, right]], 5: [[left, top], [bottom, right]], 6: [[top, bottom]], 7: [[left, top]], 8: [[left, top]], 9: [[top, bottom]], 10: [[top, right], [left, bottom]], 11: [[top, right]], 12: [[left, right]], 13: [[bottom, right]], 14: [[left, bottom]] };
+      for (const s of map[idx]) segs.push(s);
+    }
+    return segs;
+  };
+  const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const band = cv(W, H), bc = band.getContext('2d');
+  { const half = cfg.n * cfg.spacing * 1.05, rough = makeNoise(cfg.seed + 303);
+    for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
+      const f = Math.abs(field[gy * gw + gx] - cfg.offset); if (f > half) continue;
+      const x = gx * GRID, y = gy * GRID, w = 1 - Math.pow(f / half, 3);
+      const a = w * (0.1 + 0.12 * (rough(x / 22, y / 22, 2) + 1) / 2) * (cfg.fade ? cfg.fade(x, y) : 1);
+      bc.fillStyle = `rgba(0,0,0,${a.toFixed(3)})`; bc.fillRect(x, y, GRID, GRID);
+    } }
+  { bc.save(); bc.globalCompositeOperation = 'destination-out'; bc.filter = 'blur(14px)'; bc.beginPath(); cfg.shape.forEach(([x, y], i) => (i ? bc.lineTo(x, y) : bc.moveTo(x, y))); bc.closePath(); if (cfg.shape.length) bc.fill(); bc.restore(); }
+  const lines = cv(W * SS, H * SS), lc = lines.getContext('2d');
+  const glow = cv(W * SS, H * SS), gc = glow.getContext('2d');
+  lc.scale(SS, SS); gc.scale(SS, SS); lc.lineCap = gc.lineCap = 'round';
+  const chains = (segs) => {
+    const key = (p) => Math.round(p[0] * 50) + ',' + Math.round(p[1] * 50);
+    const adj = new Map();
+    segs.forEach((sg, i) => { for (const e of [0, 1]) { const k = key(sg[e]); if (!adj.has(k)) adj.set(k, []); adj.get(k).push([i, e]); } });
+    const used = new Uint8Array(segs.length), out = [];
+    const walk = (pts, front) => {
+      for (;;) {
+        const end = front ? pts[0] : pts[pts.length - 1];
+        const next = (adj.get(key(end)) || []).find(([i]) => !used[i]);
+        if (!next) return;
+        used[next[0]] = 1;
+        const other = segs[next[0]][1 - next[1]];
+        if (front) pts.unshift(other); else pts.push(other);
+      }
+    };
+    segs.forEach((sg, i) => { if (used[i]) return; used[i] = 1; const pts = [sg[0], sg[1]]; walk(pts, false); walk(pts, true); out.push(pts); });
+    return out;
+  };
+  const strokePiece = (ctx, pts, dx, dy, color, width) => {
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
+    pts.forEach(([x, y], i) => (i ? ctx.lineTo(x + dx, y + dy) : ctx.moveTo(x + dx, y + dy))); ctx.stroke();
+  };
+  lc.lineCap = gc.lineCap = 'butt'; lc.lineJoin = gc.lineJoin = 'round';
+  const PIECE = 10;
+  for (const lv of levels) {
+    const edge = 1 - Math.pow(Math.abs(lv.k) / (cfg.n + 0.5), 2.2);
+    const orange = cfg.orange.includes(lv.k);
+    for (const ch of chains(segsFor(lv.v))) {
+      for (let i = 0; i < ch.length - 1; i += PIECE) {
+        const pts = ch.slice(i, Math.min(ch.length, i + PIECE + 1));
+        const [mx, my] = pts[Math.floor(pts.length / 2)];
+        const fade = edge * (cfg.fade ? cfg.fade(mx, my) : 1);
+        if (fade <= 0.01) continue;
+        strokePiece(lc, pts, 0.8, 1.0, `rgba(0,0,0,${(0.85 * fade).toFixed(3)})`, 3.0);
+        const hl = Math.max(0, Math.min(1, (breakN(mx / 130 + lv.k * 3.7, my / 130, 2) + 0.45) * 2)) * fade;
+        if (hl > 0.02) strokePiece(lc, pts, -0.6, -0.6, `rgba(${er},${eg},${eb},${(0.58 * hl).toFixed(3)})`, 1.2);
+        if (orange) {
+          const on = Math.max(0, Math.min(1, (breakN(mx / 230 + 5, my / 230 + lv.k, 2) + 0.4) * 3.5)) * edge;
+          if (on > 0.02) {
+            strokePiece(lc, pts, 0, 0, `rgba(${ar},${ag},${ab},${(0.92 * on).toFixed(3)})`, 1.35);
+            strokePiece(gc, pts, 0, 0, `rgba(${gr_},${gg},${gb},${(0.35 * on).toFixed(3)})`, 3);
+          }
+        }
+      }
+    }
+  }
+  // Keep the volumetric form clean: cut lines under its silhouette.
+  const cut = (ctx) => { ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.filter = 'blur(14px)'; ctx.beginPath(); cfg.shape.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); if (cfg.shape.length) ctx.fill(); ctx.restore(); };
+  cut(lc); cut(gc);
+  const out = cv(W, H), oc = out.getContext('2d');
+  oc.imageSmoothingQuality = 'high';
+  oc.drawImage(plate, 0, 0, W, H);
+  oc.save(); oc.globalCompositeOperation = 'screen'; oc.filter = 'blur(14px)'; oc.globalAlpha = 0.22; oc.drawImage(glow, 0, 0, W, H); oc.restore();
+  oc.save(); oc.globalCompositeOperation = 'screen'; oc.filter = 'blur(1.5px)'; oc.globalAlpha = 0.35; oc.drawImage(glow, 0, 0, W, H); oc.restore();
+  oc.drawImage(band, 0, 0, W, H);
+  oc.drawImage(lines, 0, 0, W, H);
+  return out.toDataURL('image/png');
+};
+window.genReady = true;
+</script>
+</body></html>
